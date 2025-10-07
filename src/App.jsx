@@ -6,7 +6,7 @@ import Toasts from "./components/Toasts";
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/team">
       <Navbar />
       <Toasts />
       <Routes>
