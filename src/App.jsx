@@ -1,7 +1,18 @@
-import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import Upload from "./pages/Upload";
+import Navbar from "./components/Navbar";
+import Toasts from "./components/Toasts";
 
-function App() {
-  return <div>App</div>;
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Navbar />
+      <Toasts />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/upload" element={<Upload />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
-
-export default App;

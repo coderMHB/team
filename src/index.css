@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+body {
+    direction: rtl;
+    font-family: "Vazirmatn", sans-serif;
+    background: #0f172a;
+}
+
+#nprogress .bar {
+    background: #06b6d4 !important;
+    /* رنگ cyan */
+    height: 3px !important;
+}
+
+#nprogress .peg {
+    box-shadow: 0 0 10px #06b6d4, 0 0 5px #06b6d4 !important;
+}
