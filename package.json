@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://coderMHB.github.io/team",
+  "homepage": "https://coderMHB.github.io/composser",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
