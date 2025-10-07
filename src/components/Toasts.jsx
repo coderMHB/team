@@ -9,7 +9,7 @@ export default function Toasts() {
       position="top-left"
       theme="dark"
       rtl
-      autoClose={2500}
+      autoClose={3500}
       pauseOnHover
     />
   );

@@ -6,13 +6,19 @@ import BeforeAfterSliderWrapper from "../components/BeforeAfterSliderWrapper";
 export default function Upload() {
   const [beforeUrl, setBeforeUrl] = useState(null);
   const [afterUrl, setAfterUrl] = useState(null);
+  const [beforeSize, setBeforeSize] = useState(null);
+  const [afterSize, setAfterSize] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [fileName, setFileName] = useState("");
   const fileInputRef = useRef();
 
   const handleUpload = async (file) => {
     if (!file) return;
+    setFileName(file.name);
     setBeforeUrl(URL.createObjectURL(file));
+    setBeforeSize(file.size);
     setAfterUrl(null);
+    setAfterSize(null);
     setLoading(true);
 
     const formData = new FormData();
@@ -28,13 +34,34 @@ export default function Upload() {
       const blob = new Blob([res.data], { type: "image/webp" });
       const url = URL.createObjectURL(blob);
       setAfterUrl(url);
+      setAfterSize(res.data.size);
       notify("✅ تصویر با موفقیت فشرده شد!");
     } catch (err) {
       console.error(err);
-      notify("❌ خطایی در فشرده‌سازی رخ داد.");
+      notify("❌ خطایی در فشرده‌سازی رخ داد. دوباره امتحان کن.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const downloadImage = () => {
+    if (!afterUrl) return;
+    const link = document.createElement("a");
+    link.href = afterUrl;
+    link.download = fileName.replace(/\.[^.]+$/, ".webp");
+    link.click();
+  };
+
+  const formatSize = (size) => {
+    if (!size) return "--";
+    if (size < 1024) return size + " B";
+    if (size < 1024 * 1024) return (size / 1024).toFixed(1) + " KB";
+    return (size / (1024 * 1024)).toFixed(2) + " MB";
+  };
+
+  const reductionPercentage = () => {
+    if (!beforeSize || !afterSize) return "--";
+    return Math.round(((beforeSize - afterSize) / beforeSize) * 100) + "%";
   };
 
   return (
@@ -44,7 +71,7 @@ export default function Upload() {
           فشرده‌سازی تصویر
         </h2>
         <p className="text-slate-300 text-center mb-8">
-          فایل PNG یا JPG خودت رو انتخاب کن تا خروجی WebP بگیری با حجم کمتر.
+          عکس خودت رو انتخاب کن تا خروجی WebP بگیری با حجم کمتر.
         </p>
 
         <div className="flex flex-col items-center gap-6">
@@ -70,8 +97,19 @@ export default function Upload() {
           )}
 
           {!loading && beforeUrl && afterUrl && (
-            <div className="w-full rounded-xl overflow-hidden shadow-lg mt-6">
+            <div className="w-full mt-6 flex flex-col gap-4">
               <BeforeAfterSliderWrapper before={beforeUrl} after={afterUrl} />
+              <div className="flex justify-between text-slate-200 text-sm mt-2">
+                <span>حجم قبل: {formatSize(beforeSize)}</span>
+                <span>حجم بعد: {formatSize(afterSize)}</span>
+                <span>کاهش: {reductionPercentage()}</span>
+              </div>
+              <button
+                onClick={downloadImage}
+                className="mt-4 w-full py-3 rounded-full bg-green-500 hover:bg-green-400 font-semibold text-lg shadow-md transition-all hover:scale-105 flex justify-center items-center gap-2"
+              >
+                ⬇️ دانلود تصویر کم‌حجم
+              </button>
             </div>
           )}
 
