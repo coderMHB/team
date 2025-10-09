@@ -10,6 +10,7 @@ export default function Upload() {
   const [afterSize, setAfterSize] = useState(null);
   const [loading, setLoading] = useState(false);
   const [fileName, setFileName] = useState("");
+  const [uploadProgress, setUploadProgress] = useState(0); // برای ذخیره درصد پیشرفت بارگذاری
   const fileInputRef = useRef();
 
   const handleUpload = async (file) => {
@@ -20,6 +21,7 @@ export default function Upload() {
     setAfterUrl(null);
     setAfterSize(null);
     setLoading(true);
+    setUploadProgress(0); // بازنشانی نوار پیشرفت
 
     const formData = new FormData();
     formData.append("image", file);
@@ -28,7 +30,15 @@ export default function Upload() {
       const res = await axios.post(
         "https://compress.pythonanywhere.com/image/",
         formData,
-        { responseType: "blob" }
+        {
+          responseType: "blob",
+          onUploadProgress: (progressEvent) => {
+            const progress = Math.round(
+              (progressEvent.loaded / progressEvent.total) * 100
+            );
+            setUploadProgress(progress); // به‌روز رسانی درصد پیشرفت
+          },
+        }
       );
 
       const blob = new Blob([res.data], { type: "image/webp" });
@@ -90,9 +100,32 @@ export default function Upload() {
           </button>
 
           {loading && (
-            <div className="flex flex-col items-center gap-3 text-slate-300">
-              <div className="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
-              <p>در حال فشرده‌سازی...</p>
+            <div className="w-full max-w-xs">
+              <div className="relative pt-1">
+                <div className="flex mb-2 items-center justify-between">
+                  <div>
+                    <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-cyan-600 bg-cyan-200">
+                      در حال فشرده‌سازی...
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-cyan-600">
+                      {uploadProgress}%
+                    </span>
+                  </div>
+                </div>
+                <div className="flex mb-2">
+                  <div className="w-full bg-gray-200 rounded-full h-2.5">
+                    <div
+                      className="bg-cyan-500 h-2.5 rounded-full"
+                      style={{
+                        width: `${uploadProgress}%`,
+                        transition: "width 0.3s ease-in-out", // باعث حرکت نرم نوار پیشرفت میشه
+                      }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
